@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Subject-Verb Agreement Challenge</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      background: #f5f7fb;
+      color: #1f2937;
+    }
+    .container {
+      max-width: 960px;
+      margin: 30px auto;
+      background: #ffffff;
+      border-radius: 18px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+      overflow: hidden;
+    }
+    .header {
+      background: #1d4ed8;
+      color: white;
+      padding: 28px 32px;
+    }
+    .header h1 {
+      margin: 0 0 8px;
+      font-size: 2rem;
+    }
+    .header p {
+      margin: 0;
+      opacity: 0.95;
+      line-height: 1.5;
+    }
+    .content {
+      padding: 28px 32px 36px;
+    }
+    .stats {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-bottom: 22px;
+    }
+    .stat {
+      background: #eef2ff;
+      border-radius: 12px;
+      padding: 10px 14px;
+      font-weight: bold;
+    }
+    .card {
+      background: #f8fafc;
+      border: 1px solid #e5e7eb;
+      border-radius: 16px;
+      padding: 24px;
+    }
+    .sentence-label {
+      font-size: 0.95rem;
+      font-weight: bold;
+      color: #4b5563;
+      margin-bottom: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+    }
+    .sentence {
+      font-size: 1.6rem;
+      line-height: 1.5;
+      margin-bottom: 20px;
+    }
+    .answers {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 12px;
+    }
+    button {
+      border: none;
+      border-radius: 12px;
+      padding: 14px 16px;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: transform 0.08s ease, opacity 0.2s ease;
+    }
+    button:hover:not(:disabled) {
+      transform: translateY(-1px);
+      opacity: 0.97;
+    }
+    .answer-btn {
+      background: #dbeafe;
+      color: #1e3a8a;
+      font-weight: bold;
+    }
+    .answer-btn.correct {
+      background: #dcfce7;
+      color: #166534;
+    }
+    .answer-btn.incorrect {
+      background: #fee2e2;
+      color: #991b1b;
+    }
+    .answer-btn:disabled {
+      cursor: default;
+      opacity: 1;
+    }
+    .feedback {
+      margin-top: 18px;
+      min-height: 52px;
+      line-height: 1.5;
+      font-size: 1rem;
+    }
+    .controls {
+      margin-top: 18px;
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .primary {
+      background: #1d4ed8;
+      color: white;
+      font-weight: bold;
+    }
+    .secondary {
+      background: #e5e7eb;
+      color: #111827;
+      font-weight: bold;
+    }
+    .hidden {
+      display: none;
+    }
+    .end-screen {
+      text-align: center;
+      padding: 10px 0 4px;
+    }
+    .end-screen h2 {
+      font-size: 2rem;
+      margin-bottom: 10px;
+    }
+    .tip-box {
+      margin-top: 24px;
+      background: #eff6ff;
+      border-left: 5px solid #1d4ed8;
+      border-radius: 10px;
+      padding: 14px 16px;
+      line-height: 1.5;
+    }
+    .small {
+      color: #6b7280;
+      font-size: 0.95rem;
+      margin-top: 12px;
+    }
+    code {
+      background: #e5e7eb;
+      padding: 2px 6px;
+      border-radius: 6px;
+      font-size: 0.95em;
+    }
+    @media (max-width: 640px) {
+      .sentence {
+        font-size: 1.3rem;
+      }
+      .content {
+        padding: 20px;
+      }
+      .header {
+        padding: 22px 20px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>Subject-Verb Agreement Challenge</h1>
+      <p>Choose the correct verb to complete each sentence. This game gives instant feedback and a short explanation for each answer.</p>
+    </div>
+
+    <div class="content">
+      <div class="stats">
+        <div class="stat" id="progress">Question 1 of 12</div>
+        <div class="stat" id="score">Score: 0</div>
+        <div class="stat" id="streak">Streak: 0</div>
+      </div>
+
+      <div id="gameArea">
+        <div class="card">
+          <div class="sentence-label">Complete the sentence</div>
+          <div id="sentence" class="sentence"></div>
+          <div id="answers" class="answers"></div>
+          <div id="feedback" class="feedback"></div>
+          <div class="controls">
+            <button id="nextBtn" class="primary hidden">Next Question</button>
+            <button id="restartBtn1" class="secondary">Restart</button>
+          </div>
+        </div>
+
+        <div class="tip-box">
+          <strong>Tip:</strong> Look carefully at the true subject. Words in prepositional phrases like <em>of the students</em> or <em>with her friends</em> do not usually change the verb.
+        </div>
+      </div>
+
+      <div id="endScreen" class="end-screen hidden">
+        <h2>Great job!</h2>
+        <p id="finalMessage"></p>
+        <div class="controls" style="justify-content:center;">
+          <button id="restartBtn2" class="primary">Play Again</button>
+        </div>
+        <p class="small">To customize the game, edit the <code>questions</code> array in this HTML file.</p>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const questions = [
+      {
+        sentence: "The dog ___ loudly every morning.",
+        options: ["bark", "barks"],
+        correct: 1,
+        explanation: "The subject is singular: <strong>dog</strong>, so the singular verb <strong>barks</strong> is correct."
+      },
+      {
+        sentence: "My friends ___ soccer after school.",
+        options: ["plays", "play"],
+        correct: 1,
+        explanation: "The subject is plural: <strong>friends</strong>, so use the plural verb <strong>play</strong>."
+      },
+      {
+        sentence: "Each of the students ___ a notebook.",
+        options: ["has", "have"],
+        correct: 0,
+        explanation: "<strong>Each</strong> is singular, so the correct verb is <strong>has</strong>."
+      },
+      {
+        sentence: "The teacher and the principal ___ in the meeting.",
+        options: ["is", "are"],
+        correct: 1,
+        explanation: "Two subjects joined by <strong>and</strong> usually make a plural subject, so <strong>are</strong> is correct."
+      },
+      {
+        sentence: "One of the apples ___ rotten.",
+        options: ["is", "are"],
+        correct: 0,
+        explanation: "The subject is <strong>one</strong>, which is singular, so use <strong>is</strong>."
+      },
+      {
+        sentence: "Neither the boys nor the coach ___ ready.",
+        options: ["is", "are"],
+        correct: 0,
+        explanation: "With <strong>neither...nor</strong>, the verb agrees with the subject closest to it. <strong>Coach</strong> is singular, so use <strong>is</strong>."
+      },
+      {
+        sentence: "There ___ two books on the desk.",
+        options: ["is", "are"],
+        correct: 1,
+        explanation: "In a <strong>there is/are</strong> sentence, the verb agrees with the real subject. <strong>Two books</strong> is plural, so use <strong>are</strong>."
+      },
+      {
+        sentence: "Mathematics ___ my favorite subject.",
+        options: ["is", "are"],
+        correct: 0,
+        explanation: "<strong>Mathematics</strong> looks plural, but it is treated as singular here, so <strong>is</strong> is correct."
+      },
+      {
+        sentence: "The list of items ___ on the table.",
+        options: ["is", "are"],
+        correct: 0,
+        explanation: "The true subject is <strong>list</strong>, which is singular. The phrase <strong>of items</strong> does not change the verb."
+      },
+      {
+        sentence: "My brother, along with his friends, ___ to school early.",
+        options: ["walk", "walks"],
+        correct: 1,
+        explanation: "The true subject is <strong>brother</strong>, which is singular. The phrase <strong>along with his friends</strong> does not make it plural."
+      },
+      {
+        sentence: "The news ___ surprising.",
+        options: ["is", "are"],
+        correct: 0,
+        explanation: "<strong>News</strong> takes a singular verb here, so <strong>is</strong> is correct."
+      },
+      {
+        sentence: "Either the students or the teacher ___ the answer.",
+        options: ["know", "knows"],
+        correct: 1,
+        explanation: "With <strong>either...or</strong>, the verb agrees with the closest subject. <strong>Teacher</strong> is singular, so use <strong>knows</strong>."
+      }
+    ];
+
+    let order = [];
+    let currentIndex = 0;
+    let score = 0;
+    let streak = 0;
+    let locked = false;
+
+    const progressEl = document.getElementById("progress");
+    const scoreEl = document.getElementById("score");
+    const streakEl = document.getElementById("streak");
+    const sentenceEl = document.getElementById("sentence");
+    const answersEl = document.getElementById("answers");
+    const feedbackEl = document.getElementById("feedback");
+    const nextBtn = document.getElementById("nextBtn");
+    const restartBtn1 = document.getElementById("restartBtn1");
+    const restartBtn2 = document.getElementById("restartBtn2");
+    const endScreen = document.getElementById("endScreen");
+    const gameArea = document.getElementById("gameArea");
+    const finalMessage = document.getElementById("finalMessage");
+
+    function shuffle(array) {
+      const arr = [...array];
+      for (let i = arr.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+      }
+      return arr;
+    }
+
+    function startGame() {
+      order = shuffle(questions.map((_, i) => i));
+      currentIndex = 0;
+      score = 0;
+      streak = 0;
+      locked = false;
+      endScreen.classList.add("hidden");
+      gameArea.classList.remove("hidden");
+      updateStats();
+      renderQuestion();
+    }
+
+    function updateStats() {
+      progressEl.textContent = `Question ${currentIndex + 1} of ${questions.length}`;
+      scoreEl.textContent = `Score: ${score}`;
+      streakEl.textContent = `Streak: ${streak}`;
+    }
+
+    function renderQuestion() {
+      locked = false;
+      nextBtn.classList.add("hidden");
+      feedbackEl.innerHTML = "";
+
+      const q = questions[order[currentIndex]];
+      sentenceEl.textContent = q.sentence;
+      answersEl.innerHTML = "";
+
+      q.options.forEach((option, idx) => {
+        const btn = document.createElement("button");
+        btn.className = "answer-btn";
+        btn.textContent = option;
+        btn.addEventListener("click", () => handleAnswer(idx, btn));
+        answersEl.appendChild(btn);
+      });
+
+      updateStats();
+    }
+
+    function handleAnswer(selectedIndex, clickedBtn) {
+      if (locked) return;
+      locked = true;
+
+      const q = questions[order[currentIndex]];
+      const allButtons = document.querySelectorAll(".answer-btn");
+
+      allButtons.forEach((btn, idx) => {
+        btn.disabled = true;
+        if (idx === q.correct) {
+          btn.classList.add("correct");
+        }
+      });
+
+      if (selectedIndex === q.correct) {
+        score++;
+        streak++;
+        clickedBtn.classList.add("correct");
+        feedbackEl.innerHTML = `<strong>Correct!</strong> ${q.explanation}`;
+      } else {
+        streak = 0;
+        clickedBtn.classList.add("incorrect");
+        feedbackEl.innerHTML = `<strong>Not quite.</strong> ${q.explanation}`;
+      }
+
+      updateStats();
+      nextBtn.classList.remove("hidden");
+    }
+
+    function nextQuestion() {
+      currentIndex++;
+      if (currentIndex >= questions.length) {
+        showEndScreen();
+      } else {
+        renderQuestion();
+      }
+    }
+
+    function showEndScreen() {
+      gameArea.classList.add("hidden");
+      endScreen.classList.remove("hidden");
+
+      let message = `You scored ${score} out of ${questions.length}. `;
+      if (score === questions.length) {
+        message += "Perfect score!";
+      } else if (score >= 9) {
+        message += "Excellent work.";
+      } else if (score >= 6) {
+        message += "Nice job. Keep practicing the tricky cases.";
+      } else {
+        message += "Good start. Try again and watch for the true subject.";
+      }
+      finalMessage.textContent = message;
+    }
+
+    nextBtn.addEventListener("click", nextQuestion);
+    restartBtn1.addEventListener("click", startGame);
+    restartBtn2.addEventListener("click", startGame);
+
+    startGame();
+  </script>
+</body>
+</html>
